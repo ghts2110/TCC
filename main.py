@@ -1,9 +1,9 @@
-from nes_py import NESEnv
 from nes_py.wrappers import JoypadSpace
 import numpy as np
 import time
 
-from utils.actions import(
+from src.mario_env import CustomMarioEnv
+from utils.actions import (
     rom,
     actions,
 )

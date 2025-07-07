@@ -2,7 +2,7 @@ import os
 
 base_path = os.path.dirname(__file__)
 
-rom = base_path + "../roms/super-mario-bros.nes"
+rom = base_path + "/../roms/super-mario-bros.nes"
 
 actions = [
     ['NOOP'],            #0
