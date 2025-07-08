@@ -1,3 +1,5 @@
+import numpy as np
+
 from src.mario_view import CustomMarioView
 
 class Beliefs():
@@ -14,9 +16,10 @@ class Beliefs():
             mx, my = mario_pos
 
             region = obs[my:my+40, mx+16:mx+56]
-            region_brightness = region.mean()
+            beliefs["region_mean_brightness"] = np.mean(region)
 
-            beliefs["region_mean_brightness"] = region_brightness
+            obstacle_beliefs = self.view.detect_obstacle_ahead(obs, (mx, my))
+            beliefs.update(obstacle_beliefs)
 
         beliefs["on_ground"] = info.get("status", "") in ["small", "big", "fireball"]
 

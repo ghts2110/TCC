@@ -18,18 +18,31 @@ class CustomMarioView():
         #misc
         
         #obstacle
+        obstacle = {}
+        obstacle_path = os.path.join("src", "assets", "obstacle")
+        if os.path.exists(obstacle_path):
+            for fname in os.listdir(obstacle_path):
+                name = os.path.splitext(fname)[0]
+                img = cv2.imread(os.path.join(obstacle_path, fname))
+                if img is not None:
+                    obstacle[name] = img
         
+        templates["obstacle"] = obstacle
+
         #player
+        player = {}
         player_path = os.path.join('src', 'assets', 'player')
         if os.path.exists(player_path):
             for fname in os.listdir(player_path):
                 name = os.path.splitext(fname)[0]
                 img = cv2.imread(os.path.join(player_path, fname))
                 if img is not None:
-                    templates[name] = img
+                    player[name] = img
         
+        templates["player"] = player
 
         return templates
+
 
     def is_start_screen(self, obs, template_path="src/assets/logo_mario.png"):
         """Detecta se o logo 'SUPER MARIO BROS' está presente no frame."""
@@ -39,6 +52,7 @@ class CustomMarioView():
 
         return max_val > self.threshold
 
+
     def find_mario(self, obs):
         """Retorna a posição (x, y) do Mario no frame, ou None se não encontrado."""
         obs_bgr = cv2.cvtColor(obs, cv2.COLOR_RGB2BGR)
@@ -46,7 +60,8 @@ class CustomMarioView():
         best_score = 0
         best_pos = None
 
-        for _, template in self.templates.items():
+        player_templates = self.templates.get("player", {})
+        for _, template in player_templates.items():
             result = cv2.matchTemplate(obs_bgr, template, cv2.TM_CCOEFF_NORMED)
             _, max_val, _, max_loc = cv2.minMaxLoc(result)
 
@@ -55,3 +70,19 @@ class CustomMarioView():
                 best_pos = max_loc
 
         return best_pos
+
+
+    def detect_obstacle_ahead(self, obs, mario_pos):
+        """Detecta todos os obstáculos presentes à frente do Mario."""
+        x, y = mario_pos
+        region = obs[y:y+40, x+16:x+56]  
+
+        detections = {}
+        obstacle_templates = self.templates.get("obstacle", {})
+
+        for name, template in obstacle_templates.items():
+            result = cv2.matchTemplate(cv2.cvtColor(region, cv2.COLOR_RGB2BGR), template, cv2.TM_CCOEFF_NORMED)
+            _, max_val, _, _ = cv2.minMaxLoc(result)
+            detections[f"{name}_ahead"] = max_val >= self.threshold
+
+        return detections
