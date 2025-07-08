@@ -4,6 +4,7 @@ import random
 import time
 import cv2
 
+from src.mario_agent import CustomMarioAgent
 from src.mario_view import CustomMarioView
 from src.mario_env import CustomMarioEnv
 from utils.actions import (
@@ -12,13 +13,13 @@ from utils.actions import (
 )
 
 def main():
+    agent = CustomMarioAgent(actions)
     view = CustomMarioView()
     env = JoypadSpace(CustomMarioEnv(rom), actions)
 
     env.reset()
 
     done = True
-    IsStarted = False
     for step in range(10000):
         if done:
             obs = env.reset()
@@ -31,6 +32,9 @@ def main():
             env.step(7)
 
         env.render()
+
+        agent.update_beliefs(obs, info={})
+
         action = random.randint(0, 6)  
         obs, reward, done, info = env.step(action)
 

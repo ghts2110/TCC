@@ -1,4 +1,4 @@
-from src.mario_view import CustomMarioView
+from src.bdi.beliefs import Beliefs
 
 class CustomMarioAgent():
     def __init__(self, action_space):
@@ -6,4 +6,9 @@ class CustomMarioAgent():
         self.beliefs = {}
         self.desires = []
         self.intentions = []
-        self.view = CustomMarioView()
+
+        self.update_b = Beliefs()
+
+    def update_beliefs(self, obs, info):
+        self.beliefs = self.update_b.extract_beliefs(obs, info)
+        print(f"[Beliefs] {self.beliefs}")

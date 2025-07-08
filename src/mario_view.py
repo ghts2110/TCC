@@ -20,14 +20,13 @@ class CustomMarioView():
         #obstacle
         
         #player
-        player_path = os.path.join('assets', 'player')
+        player_path = os.path.join('src', 'assets', 'player')
         if os.path.exists(player_path):
             for fname in os.listdir(player_path):
-                if fname.endswith(".png") and fname.startswith("mario"):
-                    name = os.path.splitext(fname)[0]
-                    img = cv2.imread(os.path.join(player_path, fname))
-                    if img is not None:
-                        templates[name] = img
+                name = os.path.splitext(fname)[0]
+                img = cv2.imread(os.path.join(player_path, fname))
+                if img is not None:
+                    templates[name] = img
         
 
         return templates
@@ -47,13 +46,12 @@ class CustomMarioView():
         best_score = 0
         best_pos = None
 
-        for name, template in self.templates.items():
-            if name.startswith("mario"):
-                result = cv2.matchTemplate(obs_bgr, template, cv2.TM_CCOEFF_NORMED)
-                _, max_val, _, max_loc = cv2.minMaxLoc(result)
+        for _, template in self.templates.items():
+            result = cv2.matchTemplate(obs_bgr, template, cv2.TM_CCOEFF_NORMED)
+            _, max_val, _, max_loc = cv2.minMaxLoc(result)
 
-                if max_val > best_score and max_val >= self.threshold:
-                    best_score = max_val
-                    best_pos = max_loc
+            if max_val > best_score and max_val >= self.threshold:
+                best_score = max_val
+                best_pos = max_loc
 
         return best_pos
