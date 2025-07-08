@@ -3,5 +3,6 @@ gym==0.21.0
 gym-super-mario-bros==7.3.0
 nes-py==8.1.0
 numpy==1.24.4
+opencv-python==4.11.0.86
 pyglet==1.5.27
 tqdm==4.67.1
