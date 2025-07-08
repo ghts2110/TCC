@@ -5,7 +5,33 @@ import os
 class CustomMarioView():
     def __init__(self, threshold=0.8):
         self.threshold = threshold
+        self.templates = self.load_templates()
     
+
+    def load_templates(self):
+        templates = {}
+        
+        #enemie
+        
+        #item
+        
+        #misc
+        
+        #obstacle
+        
+        #player
+        player_path = os.path.join('assets', 'player')
+        if os.path.exists(player_path):
+            for fname in os.listdir(player_path):
+                if fname.endswith(".png") and fname.startswith("mario"):
+                    name = os.path.splitext(fname)[0]
+                    img = cv2.imread(os.path.join(player_path, fname))
+                    if img is not None:
+                        templates[name] = img
+        
+
+        return templates
+
     def is_start_screen(self, obs, template_path="src/assets/logo_mario.png"):
         """Detecta se o logo 'SUPER MARIO BROS' está presente no frame."""
         frame = cv2.cvtColor(obs, cv2.COLOR_RGB2BGR)
@@ -13,3 +39,21 @@ class CustomMarioView():
         _, max_val, _, _ = cv2.minMaxLoc(result)
 
         return max_val > self.threshold
+
+    def find_mario(self, obs):
+        """Retorna a posição (x, y) do Mario no frame, ou None se não encontrado."""
+        obs_bgr = cv2.cvtColor(obs, cv2.COLOR_RGB2BGR)
+
+        best_score = 0
+        best_pos = None
+
+        for name, template in self.templates.items():
+            if name.startswith("mario"):
+                result = cv2.matchTemplate(obs_bgr, template, cv2.TM_CCOEFF_NORMED)
+                _, max_val, _, max_loc = cv2.minMaxLoc(result)
+
+                if max_val > best_score and max_val >= self.threshold:
+                    best_score = max_val
+                    best_pos = max_loc
+
+        return best_pos
