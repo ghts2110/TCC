@@ -12,11 +12,41 @@ class CustomMarioView():
         templates = {}
         
         #enemie
+        enemie = {}
+        enemie_path = os.path.join("src", "assets", "enemie")
+        if os.path.exists(enemie_path):
+            for fname in os.listdir(enemie_path):
+                name = os.path.splitext(fname)[0]
+                img = cv2.imread(os.path.join(enemie_path, fname))
+                if img is not None:
+                    enemie[name] = img
         
+        templates["enemie"] = enemie
+
         #item
+        item = {}
+        item_path = os.path.join("src", "assets", "item")
+        if os.path.exists(item_path):
+            for fname in os.listdir(item_path):
+                name = os.path.splitext(fname)[0]
+                img = cv2.imread(os.path.join(item_path, fname))
+                if img is not None:
+                    item[name] = img
         
+        templates["item"] = item
+
         #misc
+        misc = {}
+        misc_path = os.path.join("src", "assets", "misc")
+        if os.path.exists(misc_path):
+            for fname in os.listdir(misc_path):
+                name = os.path.splitext(fname)[0]
+                img = cv2.imread(os.path.join(misc_path, fname))
+                if img is not None:
+                    misc[name] = img
         
+        templates["misc"] = misc
+
         #obstacle
         obstacle = {}
         obstacle_path = os.path.join("src", "assets", "obstacle")
