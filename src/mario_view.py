@@ -7,70 +7,28 @@ class CustomMarioView():
         self.threshold = threshold
         self.templates = self.load_templates()
     
+    def category_templates(self, folder_name):
+        category = {}
+        category_path = os.path.join("src", "assets", folder_name)
+
+        if os.path.exists(category_path):
+            for fname in os.listdir(category_path):
+                if fname.endswith(".png"):
+                    name = os.path.splitext(fname)[0]
+                    path = os.path.join(category_path, fname)
+                    img = cv2.imread(path)
+                    if img is not None:
+                        category[name] = img
+
+        return category
+
 
     def load_templates(self):
         templates = {}
         
-        #enemie
-        enemie = {}
-        enemie_path = os.path.join("src", "assets", "enemie")
-        if os.path.exists(enemie_path):
-            for fname in os.listdir(enemie_path):
-                name = os.path.splitext(fname)[0]
-                img = cv2.imread(os.path.join(enemie_path, fname))
-                if img is not None:
-                    enemie[name] = img
-        
-        templates["enemie"] = enemie
-
-        #item
-        item = {}
-        item_path = os.path.join("src", "assets", "item")
-        if os.path.exists(item_path):
-            for fname in os.listdir(item_path):
-                name = os.path.splitext(fname)[0]
-                img = cv2.imread(os.path.join(item_path, fname))
-                if img is not None:
-                    item[name] = img
-        
-        templates["item"] = item
-
-        #misc
-        misc = {}
-        misc_path = os.path.join("src", "assets", "misc")
-        if os.path.exists(misc_path):
-            for fname in os.listdir(misc_path):
-                name = os.path.splitext(fname)[0]
-                img = cv2.imread(os.path.join(misc_path, fname))
-                if img is not None:
-                    misc[name] = img
-        
-        templates["misc"] = misc
-
-        #obstacle
-        obstacle = {}
-        obstacle_path = os.path.join("src", "assets", "obstacle")
-        if os.path.exists(obstacle_path):
-            for fname in os.listdir(obstacle_path):
-                name = os.path.splitext(fname)[0]
-                img = cv2.imread(os.path.join(obstacle_path, fname))
-                if img is not None:
-                    obstacle[name] = img
-        
-        templates["obstacle"] = obstacle
-
-        #player
-        player = {}
-        player_path = os.path.join('src', 'assets', 'player')
-        if os.path.exists(player_path):
-            for fname in os.listdir(player_path):
-                name = os.path.splitext(fname)[0]
-                img = cv2.imread(os.path.join(player_path, fname))
-                if img is not None:
-                    player[name] = img
-        
-        templates["player"] = player
-
+        categories = ["enemie", "item", "misc", "obstacle", "player"]
+        for category in categories:
+            templates[category] = self.category_templates(category)
         return templates
 
 
@@ -102,65 +60,38 @@ class CustomMarioView():
         return best_pos
 
 
-    def detect_obstacle_ahead(self, obs, mario_pos):
-        """Detecta todos os obstáculos presentes à frente do Mario."""
+    def detect_category_ahead(self, category, obs, mario_pos):
+        """Detecta todos os elementos de uma categoria à frente do Mario."""
         x, y = mario_pos
-        region = obs[y:y+40, x+16:x+56]  
+        region = obs[y:y+40, x+16:x+56]
 
+        templates = self.templates.get(category, {})
         detections = {}
-        obstacle_templates = self.templates.get("obstacle", {})
 
-        for name, template in obstacle_templates.items():
-            result = cv2.matchTemplate(cv2.cvtColor(region, cv2.COLOR_RGB2BGR), template, cv2.TM_CCOEFF_NORMED)
+        region_bgr = cv2.cvtColor(region, cv2.COLOR_RGB2BGR)
+
+        for name, template in templates.items():
+            result = cv2.matchTemplate(region_bgr, template, cv2.TM_CCOEFF_NORMED)
             _, max_val, _, _ = cv2.minMaxLoc(result)
             detections[f"{name}_ahead"] = max_val >= self.threshold
 
-        return detections
+        return detections     
+
+    def detect_obstacle_ahead(self, obs, mario_pos):
+        """Detecta todos os obstáculos presentes à frente do Mario."""
+        return self.detect_category_ahead("obstacle", obs, mario_pos)
     
 
     def detect_enemie_ahead(self, obs, mario_pos):
         """Detecta se algum inimigo especificado está à frente do Mario."""
-        x, y = mario_pos
-        region = obs[y:y+40, x+16:x+56]
-
-        detections = {}
-        enemie_templates = self.templates.get("enemie", {})
-
-        for name, template in enemie_templates.items():
-            result = cv2.matchTemplate(cv2.cvtColor(region, cv2.COLOR_RGB2BGR), template, cv2.TM_CCOEFF_NORMED)
-            _, max_val, _, _ = cv2.minMaxLoc(result)
-            detections[f"{name}_ahead"] = max_val >= self.threshold
-
-        return detections
+        return self.detect_category_ahead("enemie", obs, mario_pos)
 
 
     def detect_item_ahead(self, obs, mario_pos):
         """Detecta todos os itens presentes à frente do Mario."""
-        x, y = mario_pos
-        region = obs[y:y+40, x+16:x+56]
-
-        detections = {}
-        item_templates = self.templates.get("item", {})
-
-        for name, template in item_templates.items():
-            result = cv2.matchTemplate(cv2.cvtColor(region, cv2.COLOR_RGB2BGR), template, cv2.TM_CCOEFF_NORMED)
-            _, max_val, _, _ = cv2.minMaxLoc(result)
-            detections[f"{name}_ahead"] = max_val >= self.threshold
-
-        return detections
+        return self.detect_category_ahead("item", obs, mario_pos)
 
 
     def detect_misc_ahead(self, obs, mario_pos):
         """Detecta elementos diversos (bandeiras, etc) à frente do Mario."""
-        x, y = mario_pos
-        region = obs[y:y+40, x+16:x+56]
-
-        detections = {}
-        misc_templates = self.templates.get("misc", {})
-
-        for name, template in misc_templates.items():
-            result = cv2.matchTemplate(cv2.cvtColor(region, cv2.COLOR_RGB2BGR), template, cv2.TM_CCOEFF_NORMED)
-            _, max_val, _, _ = cv2.minMaxLoc(result)
-            detections[f"{name}_ahead"] = max_val >= self.threshold
-
-        return detections
+        return self.detect_category_ahead("misc", obs, mario_pos)
