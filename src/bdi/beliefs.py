@@ -13,13 +13,20 @@ class Beliefs():
         beliefs["mario_found"] = mario_pos is not None
 
         if mario_pos:
-            mx, my = mario_pos
+            obstacles = self.view.detect_obstacle_ahead(obs, mario_pos)
+            enemies = self.view.detect_enemie_ahead(obs, mario_pos)
+            items = self.view.detect_item_ahead(obs, mario_pos)
+            misc = self.view.detect_misc_ahead(obs, mario_pos)
+            
+            beliefs.update(obstacles)
+            beliefs.update(enemies)
+            beliefs.update(items)
+            beliefs.update(misc)
 
+
+            mx, my = mario_pos
             region = obs[my:my+40, mx+16:mx+56]
             beliefs["region_mean_brightness"] = np.mean(region)
-
-            obstacle_beliefs = self.view.detect_obstacle_ahead(obs, (mx, my))
-            beliefs.update(obstacle_beliefs)
 
         beliefs["on_ground"] = info.get("status", "") in ["small", "big", "fireball"]
 
