@@ -116,3 +116,51 @@ class CustomMarioView():
             detections[f"{name}_ahead"] = max_val >= self.threshold
 
         return detections
+    
+
+    def detect_enemie_ahead(self, obs, mario_pos):
+        """Detecta se algum inimigo especificado está à frente do Mario."""
+        x, y = mario_pos
+        region = obs[y:y+40, x+16:x+56]
+
+        detections = {}
+        enemie_templates = self.templates.get("enemie", {})
+
+        for name, template in enemie_templates.items():
+            result = cv2.matchTemplate(cv2.cvtColor(region, cv2.COLOR_RGB2BGR), template, cv2.TM_CCOEFF_NORMED)
+            _, max_val, _, _ = cv2.minMaxLoc(result)
+            detections[f"{name}_ahead"] = max_val >= self.threshold
+
+        return detections
+
+
+    def detect_item_ahead(self, obs, mario_pos):
+        """Detecta todos os itens presentes à frente do Mario."""
+        x, y = mario_pos
+        region = obs[y:y+40, x+16:x+56]
+
+        detections = {}
+        item_templates = self.templates.get("item", {})
+
+        for name, template in item_templates.items():
+            result = cv2.matchTemplate(cv2.cvtColor(region, cv2.COLOR_RGB2BGR), template, cv2.TM_CCOEFF_NORMED)
+            _, max_val, _, _ = cv2.minMaxLoc(result)
+            detections[f"{name}_ahead"] = max_val >= self.threshold
+
+        return detections
+
+
+    def detect_misc_ahead(self, obs, mario_pos):
+        """Detecta elementos diversos (bandeiras, etc) à frente do Mario."""
+        x, y = mario_pos
+        region = obs[y:y+40, x+16:x+56]
+
+        detections = {}
+        misc_templates = self.templates.get("misc", {})
+
+        for name, template in misc_templates.items():
+            result = cv2.matchTemplate(cv2.cvtColor(region, cv2.COLOR_RGB2BGR), template, cv2.TM_CCOEFF_NORMED)
+            _, max_val, _, _ = cv2.minMaxLoc(result)
+            detections[f"{name}_ahead"] = max_val >= self.threshold
+
+        return detections
