@@ -12,6 +12,8 @@ class CustomMarioAgent():
 
     def update_beliefs(self, obs, info):
         self.beliefs = self.update_b.extract_beliefs(obs, info)
+        
+        # print(self.beliefs)
 
 
     def generate_desires(self):
@@ -22,17 +24,19 @@ class CustomMarioAgent():
         
         self.desires.append("reach_goal")
 
-        if any(key for key in self.beliefs if "enemie" in key and self.beliefs[key]):
+        if any(enemy in key and self.beliefs[key] for key in self.beliefs for enemy in ["goomba", "koopa"]):
             self.desires.append("avoid_enemy")
 
-        if any(key for key in self.beliefs if "obstacle" in key and self.beliefs[key]):
+        if any(obs in key and self.beliefs[key] for key in self.beliefs for obs in ["pipe_top", "block", "brick", "pipe-middle"]):
             self.desires.append("jump_over_obstacle")
 
-        if any(key for key in self.beliefs if "item" in key and self.beliefs[key]):
+        if any(it in key and self.beliefs[key] for key in self.beliefs for it in ["flower", "g_mushroom", "coin", "star", "l_mushrrom", "item"]):
             self.desires.append("collect_item")
 
         if self.beliefs.get("region_mean_brightness", 255) < 40:
             self.desires.append("proceed_cautiously")
+
+        print(self.desires)
 
 
     def filter_intentions(self):
@@ -51,7 +55,7 @@ class CustomMarioAgent():
         if "proceed_cautiously" in self.desires and "jump" not in self.intentions:
             self.intentions = ["noop"]
 
-        print(self.intentions)
+        # print(self.intentions)
 
     
     def act(self):

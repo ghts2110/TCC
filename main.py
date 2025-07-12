@@ -20,7 +20,7 @@ def main():
     env.reset()
 
     done = True
-    for step in range(10000):
+    for step in range(600):
         if done:
             obs = env.reset()
 
