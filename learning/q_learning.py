@@ -1,9 +1,12 @@
 import random
 from collections import defaultdict
 
+def default_q_values():
+    return defaultdict(float)
+
 class QLearningAgent:
     def __init__(self, actions, alpha=0.1, gamma=0.95, epsilon=0.1):
-        self.q_table = defaultdict(lambda: defaultdict(float))
+        self.q_table = defaultdict(default_q_values)
         self.actions = actions              
         self.alpha = alpha                  
         self.gamma = gamma                  

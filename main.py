@@ -1,4 +1,6 @@
 from nes_py.wrappers import JoypadSpace
+import os
+import pickle
 
 from learning.q_learning import QLearningAgent
 from src.mario_agent import CustomMarioAgent
@@ -20,6 +22,14 @@ def main():
     
     bdi_agent.update_beliefs(obs, info={})
     state = bdi_agent.beliefs
+
+    q_table_path = "q_table.pkl"
+    if os.path.exists(q_table_path):
+        with open(q_table_path, "rb") as f:
+            rl_agent.q_table = pickle.load(f)
+        print("[INFO] Q-table carregada.")
+    else:
+        print("[INFO] Iniciando nova Q-table.")
 
     for step in range(10000):
         if done:
@@ -50,6 +60,11 @@ def main():
         state = next_state
 
         env.render()
+
+
+    with open(q_table_path, "wb") as f:
+        pickle.dump(rl_agent.q_table, f)
+    print("[INFO] Q-table salva.")
 
     env.close()
 
