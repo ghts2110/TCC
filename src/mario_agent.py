@@ -12,9 +12,10 @@ class CustomMarioAgent():
 
 
     def update_beliefs(self, obs, info):
-        self.beliefs = self.update_b.extract_beliefs(obs, info)
-        
-        # print(self.beliefs)
+        # self.beliefs = self.update_b.extract_beliefs(obs, info)
+
+        self.beliefs = self.update_b.extract_binary_beliefs(obs, info)
+        print(self.beliefs)
 
 
     def generate_desires(self):

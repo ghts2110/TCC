@@ -1,9 +1,6 @@
 from nes_py.wrappers import JoypadSpace
-import numpy as np
-import random
-import time
-import cv2
 
+from learning.q_learning import QLearningAgent
 from src.mario_agent import CustomMarioAgent
 from src.mario_view import CustomMarioView
 from src.mario_env import CustomMarioEnv
@@ -13,31 +10,46 @@ from utils.actions import (
 )
 
 def main():
-    agent = CustomMarioAgent(actions)
+    bdi_agent = CustomMarioAgent(actions)
+    rl_agent = QLearningAgent(actions=["noop", "jump", "move_right"])
     view = CustomMarioView()
     env = JoypadSpace(CustomMarioEnv(rom), actions)
+    
+    obs = env.reset()
+    done = False
+    
+    bdi_agent.update_beliefs(obs, info={})
+    state = bdi_agent.beliefs
 
-    env.reset()
-
-    done = True
-    for step in range(600):
+    for step in range(10000):
         if done:
             obs = env.reset()
-
-        # if step == 100: 
-        #     cv2.imwrite("src/assets/logo_from_obs.png", cv2.cvtColor(obs, cv2.COLOR_RGB2BGR))
-        #     print("Logo capturada do obs e salva em assets/logo_from_obs.png")
+            bdi_agent.update_beliefs(obs, info={})
+            state = bdi_agent.beliefs
+            continue
 
         if view.is_start_screen(obs):
             env.step(7)
+            continue
+
+        intention = rl_agent.choose_action(state)
+        action_map = {
+            "noop": 0,         # ['NOOP']
+            "move_right": 1,   # ['right']
+            "jump": 5          # ['A']
+        }
+        action = action_map.get(intention, 0)
+
+
+        obs, reward, done, info = env.step(action)
+
+        bdi_agent.update_beliefs(obs, info={})
+        next_state = bdi_agent.beliefs
+
+        rl_agent.update(state, intention, reward, next_state)
+        state = next_state
 
         env.render()
-
-        agent.update_beliefs(obs, info={})
-        agent.generate_desires()
-        agent.filter_intentions()
-
-        obs, reward, done, info = env.step(agent.act())
 
     env.close()
 
