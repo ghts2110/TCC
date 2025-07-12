@@ -11,4 +11,23 @@ class CustomMarioAgent():
 
     def update_beliefs(self, obs, info):
         self.beliefs = self.update_b.extract_beliefs(obs, info)
-        print(f"[Beliefs] {self.beliefs}")
+
+    def generate_desires(self):
+        if not self.beliefs.get("mario_found"):
+            return
+        
+        self.desires.append("reach_goal")
+
+        if any(key for key in self.beliefs if "enemie" in key and self.beliefs[key]):
+            self.desires.append("avoid_enemy")
+
+        if any(key for key in self.beliefs if "obstacle" in key and self.beliefs[key]):
+            self.desires.append("jump_over_obstacle")
+
+        if any(key for key in self.beliefs if "item" in key and self.beliefs[key]):
+            self.desires.append("collect_item")
+
+        if self.beliefs.get("region_mean_brightness", 255) < 40:
+            self.desires.append("proceed_cautiously")
+
+        print(f"[Desires] {self.desires}")

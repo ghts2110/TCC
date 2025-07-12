@@ -34,6 +34,7 @@ def main():
         env.render()
 
         agent.update_beliefs(obs, info={})
+        agent.generate_desires()
 
         action = random.randint(0, 6)  
         obs, reward, done, info = env.step(action)
