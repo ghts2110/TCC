@@ -63,7 +63,7 @@ class CustomMarioView():
     def detect_category_ahead(self, category, obs, mario_pos):
         """Detecta todos os elementos de uma categoria à frente do Mario."""
         x, y = mario_pos
-        region = obs[y-10:y+50, x-10:x+80]
+        region = obs[y-10:y+50, x:x+80]
 
         templates = self.templates.get(category, {})
         detections = {}

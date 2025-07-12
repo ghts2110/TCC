@@ -31,7 +31,7 @@ def main():
     else:
         print("[INFO] Iniciando nova Q-table.")
 
-    for step in range(10000):
+    for step in range(1000):
         if done:
             obs = env.reset()
             bdi_agent.update_beliefs(obs, info={})
@@ -44,9 +44,15 @@ def main():
 
         intention = rl_agent.choose_action(state)
         action_map = {
-            "noop": 0,         # ['NOOP']
-            "move_right": 1,   # ['right']
-            "jump": 5          # ['A']
+            "noop": 0,          # ['NOOP']
+            "move_right": 1,    # ['right']
+            "move_left": 2,     # ['left']
+            "down": 3,          # ['down']
+            "up": 4,            # ['up']
+            "jump": 5,          # ['A']
+            "attack": 6,        # ['B']
+            "start": 7,         # ['start']
+            "select": 8         # ['select']
         }
         action = action_map.get(intention, 0)
 
