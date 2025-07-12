@@ -37,8 +37,7 @@ def main():
         agent.generate_desires()
         agent.filter_intentions()
 
-        action = random.randint(0, 6)  
-        obs, reward, done, info = env.step(action)
+        obs, reward, done, info = env.step(agent.act())
 
     env.close()
 

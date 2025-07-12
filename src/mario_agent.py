@@ -51,6 +51,12 @@ class CustomMarioAgent():
         if "proceed_cautiously" in self.desires and "jump" not in self.intentions:
             self.intentions = ["noop"]
 
-        print(f"[Intentions] {self.intentions}")
+        print(self.intentions)
 
-        
+    
+    def act(self):
+        if "jump" in self.intentions:
+            return 5  # ['A']
+        elif "move_right" in self.intentions:
+            return 1  # ['right']
+        return 0  # ['NOOP']
