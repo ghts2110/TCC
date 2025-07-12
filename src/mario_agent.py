@@ -9,10 +9,14 @@ class CustomMarioAgent():
 
         self.update_b = Beliefs()
 
+
     def update_beliefs(self, obs, info):
         self.beliefs = self.update_b.extract_beliefs(obs, info)
 
+
     def generate_desires(self):
+        self.desires = []
+
         if not self.beliefs.get("mario_found"):
             return
         
@@ -30,4 +34,23 @@ class CustomMarioAgent():
         if self.beliefs.get("region_mean_brightness", 255) < 40:
             self.desires.append("proceed_cautiously")
 
-        print(f"[Desires] {self.desires}")
+
+    def filter_intentions(self):
+        self.intentions = []
+
+        if not self.desires:
+            self.intentions.append("noop")
+            return
+
+        if "avoid_enemy" in self.desires or "jump_over_obstacle" in self.desires:
+            self.intentions.append("jump")
+
+        if "reach_goal" in self.desires or "collect_item" in self.desires:
+            self.intentions.append("move_right")
+
+        if "proceed_cautiously" in self.desires and "jump" not in self.intentions:
+            self.intentions = ["noop"]
+
+        print(f"[Intentions] {self.intentions}")
+
+        
