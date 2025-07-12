@@ -8,6 +8,7 @@ class CustomMarioAgent():
         self.intentions = []
 
         self.update_b = Beliefs()
+        self.jump_frames_left = 0
 
 
     def update_beliefs(self, obs, info):
@@ -27,7 +28,7 @@ class CustomMarioAgent():
         if any(enemy in key and self.beliefs[key] for key in self.beliefs for enemy in ["goomba", "koopa"]):
             self.desires.append("avoid_enemy")
 
-        if any(obs in key and self.beliefs[key] for key in self.beliefs for obs in ["pipe_top", "block", "brick", "pipe-middle"]):
+        if any(obs in key and self.beliefs[key] for key in self.beliefs for obs in ["pipe_top", "block", "pipe-middle"]):
             self.desires.append("jump_over_obstacle")
 
         if any(it in key and self.beliefs[key] for key in self.beliefs for it in ["flower", "g_mushroom", "coin", "star", "l_mushrrom", "item"]):
@@ -36,7 +37,7 @@ class CustomMarioAgent():
         if self.beliefs.get("region_mean_brightness", 255) < 40:
             self.desires.append("proceed_cautiously")
 
-        print(self.desires)
+        # print(self.desires)
 
 
     def filter_intentions(self):
@@ -48,6 +49,7 @@ class CustomMarioAgent():
 
         if "avoid_enemy" in self.desires or "jump_over_obstacle" in self.desires:
             self.intentions.append("jump")
+            self.jump_frames_left = 8
 
         if "reach_goal" in self.desires or "collect_item" in self.desires:
             self.intentions.append("move_right")
@@ -59,8 +61,10 @@ class CustomMarioAgent():
 
     
     def act(self):
-        if "jump" in self.intentions:
+        if self.jump_frames_left > 0:
+            self.jump_frames_left -= 1
             return 5  # ['A']
+        
         elif "move_right" in self.intentions:
             return 1  # ['right']
         return 0  # ['NOOP']
