@@ -6,27 +6,27 @@ class Beliefs():
     def __init__(self):
         self.view = CustomMarioView()
         
-    def extract_beliefs(self, obs, info):
-        beliefs = {}
+    # def extract_beliefs(self, obs, info):
+    #     beliefs = {}
 
-        mario_pos = self.view.find_mario(obs)
-        beliefs["mario_found"] = mario_pos is not None
+    #     mario_pos = self.view.find_mario(obs)
+    #     beliefs["mario_found"] = mario_pos is not None
 
-        if mario_pos:
-            obstacles = self.view.detect_obstacle_ahead(obs, mario_pos)
-            enemies = self.view.detect_enemie_ahead(obs, mario_pos)
-            items = self.view.detect_item_ahead(obs, mario_pos)
-            misc = self.view.detect_misc_ahead(obs, mario_pos)
+    #     if mario_pos:
+    #         obstacles = self.view.detect_obstacle_ahead(obs, mario_pos)
+    #         enemies = self.view.detect_enemie_ahead(obs, mario_pos)
+    #         items = self.view.detect_item_ahead(obs, mario_pos)
+    #         misc = self.view.detect_misc_ahead(obs, mario_pos)
             
-            beliefs.update(obstacles)
-            beliefs.update(enemies)
-            beliefs.update(items)
-            beliefs.update(misc)
+    #         beliefs.update(obstacles)
+    #         beliefs.update(enemies)
+    #         beliefs.update(items)
+    #         beliefs.update(misc)
 
 
-        beliefs["on_ground"] = info.get("status", "") in ["small", "big", "fireball"]
+    #     beliefs["on_ground"] = info.get("status", "") in ["small", "big", "fireball"]
 
-        return beliefs
+    #     return beliefs
     
 
     def extract_binary_beliefs(self, obs, info):

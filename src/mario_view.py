@@ -66,16 +66,16 @@ class CustomMarioView():
         region = obs[y-10:y+50, x:x+80]
 
         templates = self.templates.get(category, {})
-        detections = {}
 
         region_bgr = cv2.cvtColor(region, cv2.COLOR_RGB2BGR)
 
         for name, template in templates.items():
             result = cv2.matchTemplate(region_bgr, template, cv2.TM_CCOEFF_NORMED)
             _, max_val, _, _ = cv2.minMaxLoc(result)
-            detections[f"{name}_ahead"] = max_val >= self.threshold
+            if max_val >= self.threshold:
+                return {category : True}
 
-        return detections     
+        return {category: False}     
 
     def detect_obstacle_ahead(self, obs, mario_pos):
         """Detecta todos os obstáculos presentes à frente do Mario."""

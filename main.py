@@ -2,7 +2,7 @@ from nes_py.wrappers import JoypadSpace
 import os
 import pickle
 
-from learning.q_learning import QLearningAgent
+from src.learning.q_learning import QLearningAgent
 from src.mario_agent import CustomMarioAgent
 from src.mario_view import CustomMarioView
 from src.mario_env import CustomMarioEnv
@@ -31,7 +31,7 @@ def main():
     else:
         print("[INFO] Iniciando nova Q-table.")
 
-    for step in range(1000):
+    for step in range(10000):
         if done:
             obs = env.reset()
             bdi_agent.update_beliefs(obs, info={})
