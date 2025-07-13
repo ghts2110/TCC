@@ -24,9 +24,14 @@ def evaluate_agent(agent, view, env, bdi_agent, action_map, max_steps=10000):
             continue
 
         intention = agent.choose_action(state)
+
+        if isinstance(intention, list):
+            intention = intention[0] if intention else "noop"
+
         action = action_map.get(intention, 0)
 
         obs, reward, done, info = env.step(action)
+
         env.render()
 
         bdi_agent.update_beliefs(obs, info={})
