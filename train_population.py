@@ -11,9 +11,10 @@ from src.mario_agent import CustomMarioAgent
 from src.mario_view import CustomMarioView
 from src.mario_env import CustomMarioEnv
 from utils.actions import rom
+from src.learning.q_learning import QLearningAgent
 
-POPULATION_SIZE = 1
-GENERATIONS = 2
+POPULATION_SIZE = 5
+GENERATIONS = 10
 MUTATION_RATE = 0.05
 MAX_STEPS = 5000
 SAVE_PATH = "best_q_table.pkl"
@@ -42,7 +43,19 @@ def main():
         "select": 8         # ['select']
     }
 
-    agents = create_population(POPULATION_SIZE, actions=["noop", "jump", "move_right"])
+    agents = []
+
+    if os.path.exists(SAVE_PATH):
+        with open(SAVE_PATH, "rb") as f:
+            q_table = pickle.load(f)
+        print("[INFO] Q-table anterior carregada.")
+        
+        best_agent = QLearningAgent(actions=["noop", "jump", "move_right"])
+        best_agent.q_table = q_table
+        agents = next_generation(best_agent, POPULATION_SIZE, mutation_rate=MUTATION_RATE)
+    else:
+        print("[INFO] Nenhum modelo anterior encontrado. Criando população nova.")
+        agents = create_population(POPULATION_SIZE, actions=["noop", "jump", "move_right"])
 
     for gen in range(GENERATIONS):
         print(f"\n Geração {gen+1}/{GENERATIONS}")
