@@ -2,6 +2,9 @@
 import argparse, time
 import retro
 
+from src.actions import spam_start_for_seconds
+
+
 def main():
     # PARSING DE ARGUMENTOS
     ap = argparse.ArgumentParser()
@@ -26,7 +29,7 @@ def main():
 
     # LOOP PRINCIPAL (RODAR O JOGO)
     while steps < args.max_steps:
-        action = env.action_space.sample()  # <- aleatório
+        action = spam_start_for_seconds(steps=steps, env=env)  # <- aleatório
         obs, reward, terminated, truncated, info = env.step(action)
         ep_reward += reward
         env.render()  # mostra a janela
