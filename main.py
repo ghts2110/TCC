@@ -3,6 +3,7 @@ import argparse, time
 import retro
 
 from src.actions import spam_start_for_seconds
+from src.sf_env import sf_env
 
 
 def main():
@@ -12,19 +13,13 @@ def main():
     ap.add_argument("--state", default=None)  
     ap.add_argument("--discrete", action="store_true",
                     help="Usa conjunto de ações DISCRETE (bom p/ Sonic).")
-    ap.add_argument("--fps", type=float, default=60.0)
-    ap.add_argument("--max-steps", type=int, default=10_000)
+    ap.add_argument("--fps", type=float, default=0.0) # velocidade do jogo
+    ap.add_argument("--max-steps", type=int, default=10_000) # duração 
     args = ap.parse_args()
 
 
     # CRIAÇÃO DO AMBIENTE
-    action_mode = retro.Actions.DISCRETE if args.discrete else retro.Actions.ALL
-    env = retro.make(game=args.game, state=args.state, use_restricted_actions=action_mode)
-
-    obs, info = env.reset()
-    steps, ep, ep_reward = 0, 0, 0.0
-    last = time.perf_counter()
-    print(f"Ação: {env.action_space} | Obs: {getattr(env.observation_space,'shape', None)}")
+    env, obs, info, steps, ep, ep_reward, last = sf_env(args)
 
 
     # LOOP PRINCIPAL (RODAR O JOGO)
