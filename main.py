@@ -19,22 +19,22 @@ def main():
 
 
     # CRIAÇÃO DO AMBIENTE
-    env, obs, info, steps, ep, ep_reward, last = sf_env(args)
+    sfe = sf_env(args)
 
 
     # LOOP PRINCIPAL (RODAR O JOGO)
-    while steps < args.max_steps:
-        action = spam_start_for_seconds(steps=steps, env=env)  # <- aleatório
-        obs, reward, terminated, truncated, info = env.step(action)
-        ep_reward += reward
-        env.render()  # mostra a janela
+    while sfe.steps < args.max_steps:
+        action = spam_start_for_seconds(steps=sfe.steps, env=sfe.env)  # <- aleatório
+        obs, reward, terminated, truncated, info = sfe.env.step(action)
+        sfe.ep_reward += reward
+        sfe.env.render()  # mostra a janela
 
-        steps += 1
+        sfe.steps += 1
         if terminated or truncated:
             ep += 1
             print(f"Episódio {ep} acabou | reward={ep_reward:.2f}")
             ep_reward = 0.0
-            obs, info = env.reset()
+            obs, info = sfe.env.reset()
 
         if args.fps > 0:
             now = time.perf_counter()
@@ -42,7 +42,7 @@ def main():
             if dt > 0: time.sleep(dt)
             last = now
 
-    env.close()
+    sfe.env.close()
 
 if __name__ == "__main__":
     main()
