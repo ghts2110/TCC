@@ -1,8 +1,8 @@
 # random_play.py
 import argparse, time
 import retro
+import numpy as np
 
-from src.actions import spam_start_for_seconds
 from src.sf_env import sf_env
 
 
@@ -24,23 +24,13 @@ def main():
 
     # LOOP PRINCIPAL (RODAR O JOGO)
     while sfe.steps < args.max_steps:
-        action = spam_start_for_seconds(steps=sfe.steps, env=sfe.env)  # <- aleatório
-        obs, reward, terminated, truncated, info = sfe.env.step(action)
-        sfe.ep_reward += reward
-        sfe.env.render()  # mostra a janela
+        obs, reward, terminated, truncated, info = sfe.step()
 
         sfe.steps += 1
         if terminated or truncated:
             ep += 1
-            print(f"Episódio {ep} acabou | reward={ep_reward:.2f}")
-            ep_reward = 0.0
-            obs, info = sfe.env.reset()
-
-        if args.fps > 0:
-            now = time.perf_counter()
-            dt = (1.0 / args.fps) - (now - last)
-            if dt > 0: time.sleep(dt)
-            last = now
+            print(f"Episódio {ep} acabou | reward={sfe.ep_reward:.2f}")
+            sfe.env.reset()
 
     sfe.env.close()
 
