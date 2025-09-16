@@ -1,38 +1,28 @@
-# random_play.py
-import argparse, time
-import retro
-import numpy as np
+import argparse
+from google.cloud import documentai_v1 as documentai
 
-from src.sf_env import sf_env
+def process_document(project_id, location, processor_id, file_path):
+    client = documentai.DocumentProcessorServiceClient(
+        client_options={"api_endpoint": f"{location}-documentai.googleapis.com"}
+    )
+    name = client.processor_path(project_id, location, processor_id)
 
+    with open(file_path, "rb") as f:
+        raw_document = documentai.RawDocument(content=f.read(), mime_type="image/jpeg")
 
-def main():
-    # PARSING DE ARGUMENTOS
-    ap = argparse.ArgumentParser()
-    ap.add_argument("--game", default="StreetFighterIISpecialChampionEdition-Genesis")
-    ap.add_argument("--state", default=None)  
-    ap.add_argument("--discrete", action="store_true",
-                    help="Usa conjunto de ações DISCRETE (bom p/ Sonic).")
-    ap.add_argument("--fps", type=float, default=0.0) # velocidade do jogo
-    ap.add_argument("--max-steps", type=int, default=10_000) # duração 
-    args = ap.parse_args()
+    request = documentai.ProcessRequest(name=name, raw_document=raw_document)
+    result = client.process_document(request=request)
 
-
-    # CRIAÇÃO DO AMBIENTE
-    sfe = sf_env(args)
-
-
-    # LOOP PRINCIPAL (RODAR O JOGO)
-    while sfe.steps < args.max_steps:
-        obs, reward, terminated, truncated, info = sfe.step()
-
-        sfe.steps += 1
-        if terminated or truncated:
-            ep += 1
-            print(f"Episódio {ep} acabou | reward={sfe.ep_reward:.2f}")
-            sfe.env.reset()
-
-    sfe.env.close()
+    print("Texto extraído (início):")
+    print(result.document.text[:500])
 
 if __name__ == "__main__":
-    main()
+    parser = argparse.ArgumentParser(description="Processar documento com Document AI")
+    parser.add_argument("--project_id", required=True, help="ID do projeto GCP")
+    parser.add_argument("--location", required=True, help="Região (ex: us, eu, us-latin1)")
+    parser.add_argument("--processor_id", required=True, help="ID do processador Document AI")
+    parser.add_argument("--file", required=True, help="Caminho do arquivo de imagem/PDF")
+
+    args = parser.parse_args()
+
+    process_document(args.project_id, args.location, args.processor_id, args.file)
