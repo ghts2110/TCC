@@ -1,6 +1,6 @@
 import json
 
-CAMPOS_OBRIGATORIOS = {
+REQUIRED_FIELDS = {
     "Carteira de Identidade": [
         "name",
         "RG",
@@ -11,46 +11,59 @@ CAMPOS_OBRIGATORIOS = {
         "original-dock",
         "CPF"
     ],"Passaporte": [
-        "name",
-        "passport-number",
-        "date-of-birth",
-        "validity",
-        "nationality"
+        "type",              
+        "issuing-country",   
+        "passport-number",   
+        "full-name",  
+        "nationality",
+        "date-of-birth",   
+        "sex",               
+        "place-of-birth",   
+        "issue-date",   
+        "expiry-date",   
+        "issuing-authority" 
     ],
     "Registro Nacional de Estrangeiros - RNE": [
-        "name",
-        "RNE",
-        "date-of-birth",
-        "country-of-origin",
-        "validity"
+        "rne-number",      
+        "full-name",   
+        "affiliation",      
+        "date-of-birth",    
+        "sex",
+        "nationality",      
+        "place-of-birth",    
+        "arrival-date",
+        "migratory-category", 
+        "issue-date",      
+        "expiry-date",    
+        "issuing-authority"    
     ]
 }
 
 
-def validar_documento(json_str):
+def validar_documento(json_str: str):
     try:
-        dados = json.loads(json_str)
+        data = json.loads(json_str)
     except json.JSONDecodeError as e:
         print(f"JSON inválido: {e}")
         return
     
-    tipo = dados.get("type")
-    if tipo not in CAMPOS_OBRIGATORIOS:
-        print(f"Tipo de documento '{tipo}' não reconhecido.")
+    doc_type = data.get("type")
+    if doc_type not in REQUIRED_FIELDS:
+        print(f"Tipo de documento '{doc_type}' não reconhecido.")
         return
     
-    print(f"Validando documento: {tipo}")
-    obrigatorios = CAMPOS_OBRIGATORIOS[tipo]
-    faltando = []
+    print(f"Validando documento: {doc_type}")
+    required = REQUIRED_FIELDS[doc_type]
+    missing = []
     
-    for campo in obrigatorios:
-        if not dados.get(campo):  
-            faltando.append(campo)
+    for field in required:
+        if not data.get(field):  
+            missing.append(field)
 
-    if faltando:
+    if missing:
         print("Campos obrigatórios faltando:")
-        for f in faltando:
-            print(f)
+        for f in missing:
+            print(f"- {f}")
     else:
         print("Todos os campos obrigatórios estão presentes.")
     
@@ -59,15 +72,13 @@ def validar_documento(json_str):
 if __name__ == "__main__":
     exemplo_json = '''
     {
-        "type": "Carteira de Identidade",
-        "name": "",
-        "RG": "",
-        "shipping-date": "",
-        "affiliation": "",
-        "naturalness": "",
-        "date-of-birth": "",
-        "original-dock": "",
-        "CPF": ""
+        "type": "Passaporte",
+        "issuing-country": "BRA",
+        "passport-number": "PA9876543",
+        "full-name": "Carlos Pereira",
+        "nationality": "Brasileira",
+        "date-of-birth": "1992-03-15",
+        "sex": "M"
     }
     '''.replace("//", "#")
 
